@@ -1,0 +1,18 @@
+package: github.com/webliupeng/gin-tonic
+import:
+- package: github.com/gin-gonic/gin
+  version: master
+- package: github.com/go-redis/redis
+  version: v6.10.2
+- package: github.com/jinzhu/gorm
+  version: v1.9.1
+  subpackages:
+  - dialects/mysql
+- package: github.com/parnurzeal/gorequest
+  version: v0.2.15
+- package: github.com/stretchr/objx
+  version: ^0.1.0
+- package: github.com/stretchr/testify
+  version: ^1.2.1
+  subpackages:
+  - assert

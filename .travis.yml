@@ -1,0 +1,17 @@
+language: go
+services:
+  - mysql
+go: 
+ - 1.9.x
+
+before_script:
+ - "mysql -e 'create database gintonic;'"
+
+before_install:
+  - go get github.com/tcnksm/ghr
+  - go get github.com/axw/gocov/gocov
+  - go get github.com/mattn/goveralls
+script:
+ - export export DB_URI='root@tcp(localhost:3306)/gintonic?charset=utf8mb4&parseTime=true'
+ - go test -v ./helpers -race -coverprofile=coverage.out -coverpkg=../... -covermode=atomic
+ - goveralls -coverprofile=coverage.out -service travis-ci -repotoken $COVERALLS_TOKEN
