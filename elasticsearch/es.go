@@ -19,8 +19,16 @@ func (c *Client) Index(name string) *Index {
 }
 
 func (c *Client) Search(index string, dsl interface{}) *Result {
+	return c.post(idnex, "search", dsl)
+}
+
+func (c *Client) Count(index string, dsl interface{}) *Result {
+	return c.post(idnex, "count", dsl)
+}
+
+func (c *Client) post(index string, action string, dsl interface{}) *Result {
 	request := gorequest.New()
-	url := fmt.Sprintf("%s%s/_search", c.url, index)
+	url := fmt.Sprintf("%s%s/_%s", c.url, index, action)
 
 	resultBody := &ResultBody{}
 
