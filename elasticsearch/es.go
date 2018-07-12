@@ -51,6 +51,7 @@ type Aggregation struct {
 }
 
 type ResultBody struct {
+	Count    int  `json:"count"`
 	Took     int  `json:"took"`
 	TimedOut bool `json:"timed_out"`
 	Shards   struct {
