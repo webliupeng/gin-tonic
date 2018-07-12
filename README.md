@@ -12,23 +12,25 @@ Gin-tonic is inspired by redstone's open-rest project which helps developers bui
 
 **USAGE**
 
-    import (
-		"github.com/webliupeng/gin-tonic/helpers"
-	)
+```go
+import (
+	"github.com/webliupeng/gin-tonic/helpers"
+)
 
-	type Foo struct {
-		Bar string
-	}
-	func (f *Foo)InsertableFields() []string {
-		return []string{"bar"}
-	}
-	
-	func (f *Foo)UpdateableFields() []string {
-		return []string{"bar"}
-	}
+type Foo struct {
+	Bar string
+}
+func (f *Foo)InsertableFields() []string {
+	return []string{"bar"}
+}
 
-	router.POST("/posts", helpers.Create(func(c *gin.Context){ return &Foo{} }))
-	router.GET("/posts", helpers.List(&Foo{}))
-	router.GET("/posts/:id", helpers.FindOneByParam(&Foo{}, "id", "foo"), helpers.ServeJSONFromContext("foo"))
-	router.DELETE("/posts/:id", helpers.FindOneByParam(&Foo{}, "id", "foo"), helpers.Delete("foo"))
-	router.PUT("/posts/:id", helpers.FindOneByParam(&Foo{}, "id", "foo"), helpers.Update("foo"))
+func (f *Foo)UpdateableFields() []string {
+	return []string{"bar"}
+}
+
+router.POST("/posts", helpers.Create(func(c *gin.Context){ return &Foo{} }))
+router.GET("/posts", helpers.List(&Foo{}))
+router.GET("/posts/:id", helpers.FindOneByParam(&Foo{}, "id", "foo"), helpers.ServeJSONFromContext("foo"))
+router.DELETE("/posts/:id", helpers.FindOneByParam(&Foo{}, "id", "foo"), helpers.Delete("foo"))
+router.PUT("/posts/:id", helpers.FindOneByParam(&Foo{}, "id", "foo"), helpers.Update("foo"))
+```
