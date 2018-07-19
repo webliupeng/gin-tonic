@@ -15,7 +15,9 @@ type ModelInstanceCreator func(c *gin.Context) interface{}
 func Create(instanceCreator ModelInstanceCreator) gin.HandlerFunc {
 	return func(c *gin.Context) {
 		modelInstance := instanceCreator(c)
-
+		if modelInstance == nil {
+			return
+		}
 		if insertable, ok := modelInstance.(db.Insertable); !ok {
 			ErrorResponse(c, http.StatusForbidden, "Can not write this resource")
 			return
