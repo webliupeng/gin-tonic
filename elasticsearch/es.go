@@ -4,6 +4,7 @@ import (
 	"fmt"
 
 	"github.com/parnurzeal/gorequest"
+	"github.com/webliupeng/gin-tonic/utils"
 )
 
 type Client struct {
@@ -19,6 +20,11 @@ func (c *Client) Count(index string, dsl interface{}) *Result {
 }
 
 func (c *Client) post(index string, action string, dsl interface{}) *Result {
+	config := utils.GetConfig()
+	// DisableTransportSwap flag can be used to block Transport assignment in EndBytes method. After setting it to true, it is possible to use httpmock with gorequest
+	if isHTTPMock := config.GetExt("httpMock").Bool(); isHTTPMock {
+		gorequest.DisableTransportSwap = true
+	}
 	request := gorequest.New()
 	url := fmt.Sprintf("%s%s/_%s", c.url, index, action)
 
