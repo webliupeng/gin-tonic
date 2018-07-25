@@ -145,7 +145,11 @@ func testRouter() *gin.Engine {
 func init() {
 	R = testRouter()
 	db.DB().DropTable(&Item{})
-	db.DB().AutoMigrate(&Item{})
+	err := db.DB().AutoMigrate(&Item{}).Error
+
+	if err != nil {
+		panic(err)
+	}
 
 	for i := 0; i < 50; i++ {
 		item := &Item{}
