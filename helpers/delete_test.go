@@ -13,7 +13,7 @@ import (
 
 func TestDelete(t *testing.T) {
 	item := &Item{}
-	db.DB().First(&item)
+	db.DB().Last(&item)
 	req, _ := http.NewRequest("DELETE", fmt.Sprintf("/list/%d", item.ID), nil)
 	record := httptest.NewRecorder()
 
