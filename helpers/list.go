@@ -30,7 +30,7 @@ func CriteriaByParam(key string) CriteriaCreator {
 	return f
 }
 
-// List - 列表输出模型
+// List - Generate a handler to handle response a list
 func List(modelIns interface{}, paramCreators ...CriteriaCreator) gin.HandlerFunc {
 	return func(c *gin.Context) {
 		myType := reflect.TypeOf(modelIns)
@@ -62,7 +62,7 @@ func List(modelIns interface{}, paramCreators ...CriteriaCreator) gin.HandlerFun
 				return key + " >= ?", val
 			},
 			"in": func(key, val string) (string, interface{}) {
-				return key + " IN (?)", val
+				return key + " IN (?)", strings.Split(val, ",")
 			},
 			"not": func(key, val string) (string, interface{}) {
 				return key + " NOT IN (?)", val
@@ -115,7 +115,6 @@ func List(modelIns interface{}, paramCreators ...CriteriaCreator) gin.HandlerFun
 
 		var total int
 
-		//fmt.Println("recevied max result", pageSize)
 		query.Limit(pageSize).Offset(offset).Find(x.Interface())
 
 		db.DB().Model(x.Interface()).Where(strings.Join(expressions, " AND "), values...).Count(&total)

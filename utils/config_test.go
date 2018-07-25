@@ -10,8 +10,21 @@ import (
 
 func TestExtConfig(t *testing.T) {
 
-	defer os.RemoveAll("./configs")
-	_ = os.Mkdir("./configs", 0777)
+	//defer os.RemoveAll("/tmp/configs")
+
+	config := GetConfig()
+	assert.Equal(t, "bar", config.GetExt("foo").Str())
+	assert.Equal(t, float64(1), config.GetExt("num").Float64())
+}
+
+func TestCommonFuncs(t *testing.T) {
+
+	assert.Equal(t, "Foo", UpperInitial("foo"))
+}
+
+func init() {
+
+	_ = os.Mkdir("/tmp/configs", 0777)
 
 	text := `{
 		"app": {
@@ -38,11 +51,8 @@ func TestExtConfig(t *testing.T) {
 		}
 	}`
 
-	if err := ioutil.WriteFile("./configs/config.test.json", []byte(text), 0644); err != nil {
-		t.Error(err)
+	if err := ioutil.WriteFile("/tmp/configs/config.test.json", []byte(text), 0644); err != nil {
+		panic(err)
 	}
 
-	config := GetConfig()
-	assert.Equal(t, "bar", config.GetExt("foo").Str())
-	assert.Equal(t, float64(1), config.GetExt("num").Float64())
 }

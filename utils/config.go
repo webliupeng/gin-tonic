@@ -61,7 +61,6 @@ func GetConfig() Config {
 	configFile := path.Join(configDir, "config."+env+".json")
 	if d, err := ioutil.ReadFile(configFile); err == nil {
 		if err := json.Unmarshal(d, &ret); err != nil {
-			//panic(err)
 			fmt.Println("Config format incorrect")
 		}
 	} else {

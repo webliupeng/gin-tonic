@@ -23,6 +23,17 @@ func TestCreate(t *testing.T) {
 	assert.Equal(t, 201, record.Code)
 }
 
+func TestCreateWithoutWritable(t *testing.T) {
+	req, _ := http.NewRequest("POST", "/list2", bytes.NewReader([]byte(`{
+		"foo":"REPLY"
+	}`)))
+	record := httptest.NewRecorder()
+
+	R.ServeHTTP(record, req)
+
+	assert.Equal(t, 403, record.Code)
+}
+
 func TestCreateWithBadJSON(t *testing.T) {
 	req, _ := http.NewRequest("POST", "/list", bytes.NewReader([]byte(`{
 		"foo":"REPLY",
@@ -32,6 +43,10 @@ func TestCreateWithBadJSON(t *testing.T) {
 	R.ServeHTTP(record, req)
 
 	assert.Equal(t, 400, record.Code)
+}
+
+type ReadOnlyItem struct {
+	Bar string
 }
 
 func init() {
@@ -45,6 +60,12 @@ func init() {
 		return true
 	}), helpers.Create(func(c *gin.Context) interface{} {
 		item := &Item{}
+		item.Bar = "haha"
+		return item
+	}))
+
+	R.POST("/list2", helpers.Create(func(c *gin.Context) interface{} {
+		item := &ReadOnlyItem{}
 		item.Bar = "haha"
 		return item
 	}))

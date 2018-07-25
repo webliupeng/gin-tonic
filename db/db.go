@@ -24,7 +24,7 @@ func init() {
 	db, err = gorm.Open("mysql", cs)
 
 	db.DB().SetMaxOpenConns(100)
-	db.DB().SetMaxIdleConns(2)
+	db.DB().SetMaxIdleConns(20)
 	db.DB().SetConnMaxLifetime(time.Duration(10) * time.Minute)
 	if err != nil {
 		fmt.Println("bad connection", cs)

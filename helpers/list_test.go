@@ -1,6 +1,7 @@
 package helpers_test
 
 import (
+	"encoding/json"
 	"fmt"
 	"net/http"
 	"net/http/httptest"
@@ -14,6 +15,11 @@ import (
 	"github.com/webliupeng/gin-tonic/db"
 	"github.com/webliupeng/gin-tonic/helpers"
 )
+
+type Resp struct {
+	Total float64
+	Data  []Item
+}
 
 type Item struct {
 	gorm.Model
@@ -89,15 +95,43 @@ func TestGranterThan(t *testing.T) {
 
 	R.ServeHTTP(record, req)
 
-	assert.Equal(t, record.Code, 200)
+	assert.Equal(t, 200, record.Code)
 }
 
 func TestLessThan(t *testing.T) {
-	req, _ := http.NewRequest("GET", "/list?id_lt=2&id_gt=3", nil)
+	req, _ := http.NewRequest("GET", "/list?id_lt=2", nil)
 	record := httptest.NewRecorder()
 
 	R.ServeHTTP(record, req)
+	rr := &Resp{}
+	json.Unmarshal(record.Body.Bytes(), &rr)
 
+	assert.Equal(t, float64(1), rr.Total)
+	assert.Equal(t, record.Code, 200)
+}
+
+func TestInquery(t *testing.T) {
+	req, _ := http.NewRequest("GET", "/list?id_in=1,2,3", nil)
+	record := httptest.NewRecorder()
+
+	R.ServeHTTP(record, req)
+	rr := &Resp{}
+	json.Unmarshal(record.Body.Bytes(), &rr)
+
+	fmt.Println("fff", record.Body.String())
+	assert.Equal(t, float64(3), rr.Total)
+	assert.Equal(t, record.Code, 200)
+}
+
+func TestGrantThan(t *testing.T) {
+	req, _ := http.NewRequest("GET", "/list?id_gt=2", nil)
+	record := httptest.NewRecorder()
+
+	R.ServeHTTP(record, req)
+	rr := &Resp{}
+	json.Unmarshal(record.Body.Bytes(), &rr)
+
+	assert.Equal(t, uint(3), rr.Data[0].ID)
 	assert.Equal(t, record.Code, 200)
 }
 
