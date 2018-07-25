@@ -5,9 +5,7 @@ import (
 )
 
 func UpperInitial(str string) string {
-	for i, v := range str {
-		return string(unicode.ToUpper(v)) + str[i+1:]
-	}
 
-	return ""
+	runes := []rune(str)
+	return string(unicode.ToUpper(runes[0])) + str[1:]
 }

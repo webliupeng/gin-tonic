@@ -141,6 +141,7 @@ func testRouter() *gin.Engine {
 	}
 	return R
 }
+
 func init() {
 	R = testRouter()
 	db.DB().DropTable(&Item{})
