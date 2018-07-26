@@ -128,7 +128,7 @@ func TestInquery(t *testing.T) {
 }
 
 func TestOrderBy(t *testing.T) {
-	req, _ := http.NewRequest("GET", "/list?.orderby=-id", nil)
+	req, _ := http.NewRequest("GET", "/list?.sort=-id", nil)
 	record := httptest.NewRecorder()
 
 	R.ServeHTTP(record, req)

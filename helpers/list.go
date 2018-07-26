@@ -122,7 +122,7 @@ func List(modelIns interface{}, paramCreators ...CriteriaCreator) gin.HandlerFun
 				sortableFields[val] = true
 			}
 
-			orderby := c.DefaultQuery(".orderby", "id")
+			orderby := c.DefaultQuery(".sort", "id")
 			orderField := orderby
 			isDesc := false
 			if orderby[0:1] == "-" {
