@@ -136,6 +136,7 @@ func TestOrderBy(t *testing.T) {
 	json.Unmarshal(record.Body.Bytes(), &rr)
 
 	fmt.Println("fff", record.Body.String())
+	assert.Equal(t, record.Code, 200)
 }
 
 func TestGrantThan(t *testing.T) {

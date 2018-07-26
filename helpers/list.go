@@ -93,7 +93,7 @@ func List(modelIns interface{}, paramCreators ...CriteriaCreator) gin.HandlerFun
 			values = append(values, value)
 		}
 
-		query := db.DB().Debug().Where(strings.Join(expressions, " AND "), values...)
+		query := db.DB().Where(strings.Join(expressions, " AND "), values...)
 		if includes := c.Query(".includes"); includes != "" {
 			for _, table := range strings.Split(includes, ",") {
 				query = query.Preload(utils.UpperInitial(table))
