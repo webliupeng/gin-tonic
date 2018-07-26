@@ -28,6 +28,10 @@ type Item struct {
 	UserID string
 }
 
+func (i Item) SortableFields() []string {
+	return []string{"foo", "id"}
+}
+
 func (i Item) UpdatableFields() []string {
 	return []string{"foo", "bar"}
 }
@@ -121,6 +125,17 @@ func TestInquery(t *testing.T) {
 	fmt.Println("fff", record.Body.String())
 	assert.Equal(t, float64(3), rr.Total)
 	assert.Equal(t, record.Code, 200)
+}
+
+func TestOrderBy(t *testing.T) {
+	req, _ := http.NewRequest("GET", "/list?.orderby=-id", nil)
+	record := httptest.NewRecorder()
+
+	R.ServeHTTP(record, req)
+	rr := &Resp{}
+	json.Unmarshal(record.Body.Bytes(), &rr)
+
+	fmt.Println("fff", record.Body.String())
 }
 
 func TestGrantThan(t *testing.T) {

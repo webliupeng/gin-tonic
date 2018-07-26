@@ -41,3 +41,7 @@ type Updatable interface {
 type Insertable interface {
 	InsertableFields() []string
 }
+
+type Sortable interface {
+	SortableFields() []string
+}

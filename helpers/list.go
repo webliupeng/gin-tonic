@@ -93,7 +93,7 @@ func List(modelIns interface{}, paramCreators ...CriteriaCreator) gin.HandlerFun
 			values = append(values, value)
 		}
 
-		query := db.DB().Where(strings.Join(expressions, " AND "), values...)
+		query := db.DB().Debug().Where(strings.Join(expressions, " AND "), values...)
 		if includes := c.Query(".includes"); includes != "" {
 			for _, table := range strings.Split(includes, ",") {
 				query = query.Preload(utils.UpperInitial(table))
@@ -111,6 +111,34 @@ func List(modelIns interface{}, paramCreators ...CriteriaCreator) gin.HandlerFun
 
 		if err2 != nil {
 			panic(err2)
+		}
+
+		if sortable, ok := modelIns.(db.Sortable); ok {
+
+			fields := sortable.SortableFields()
+			sortableFields := map[string]interface{}{}
+
+			for _, val := range fields {
+				sortableFields[val] = true
+			}
+
+			orderby := c.DefaultQuery(".orderby", "id")
+			orderField := orderby
+			isDesc := false
+			if orderby[0:1] == "-" {
+				orderField = orderby[1:]
+				isDesc = true
+			}
+
+			//fmt.Println("sortable", fields, orderField)
+
+			if sortableFields[orderField] != nil {
+				if isDesc {
+					query = query.Order(orderField + " DESC")
+				} else {
+					query = query.Order(orderField + " ASC")
+				}
+			}
 		}
 
 		var total int
