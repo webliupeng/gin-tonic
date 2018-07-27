@@ -21,5 +21,5 @@ done
 if [ -n "$COVERALLS" ]
 then
 	#goveralls -coverprofile=acc.out $COVERALLS
-    goveralls -coverprofile=coverage.txt -service travis-ci -repotoken $COVERALLS_TOKEN
+    goveralls -coverprofile=acc.out -service travis-ci -repotoken $COVERALLS_TOKEN
 fi	
