@@ -14,5 +14,6 @@ before_install:
 script:
  - export ENV=test
  - export DB_URI='root@tcp(localhost:3306)/gintonic?charset=utf8mb4&parseTime=true'
- - go test -v ./helpers -race -coverprofile=coverage.out -coverpkg=../... -covermode=atomic
+ - go test -v ./helpers -race -coverprofile=coverage.out -coverpkg=./... -covermode=atomic
+ - go test -v ./elasticsearch -race -coverprofile=coverage.out -coverpkg=./... -covermode=atomic
  - goveralls -coverprofile=coverage.out -service travis-ci -repotoken $COVERALLS_TOKEN
