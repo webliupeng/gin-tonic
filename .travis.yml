@@ -16,4 +16,3 @@ script:
  - export CONFIGDIR=/tmp/configs
  - export DB_URI='root@tcp(localhost:3306)/gintonic?charset=utf8mb4&parseTime=true'
  - ./test.sh
- - goveralls -coverprofile=coverage.txt -service travis-ci -repotoken $COVERALLS_TOKEN
