@@ -14,8 +14,13 @@ func init() {
 	host := GetConfig().Redis.Host
 	port := GetConfig().Redis.Port
 
-	host = os.Getenv("REDIS_HOST")
-	port = os.Getenv("REDIS_PORT")
+	if v := os.Getenv("REDIS_HOST"); v != "" {
+		host = v
+	}
+
+	if v := os.Getenv("REDIS_PORT"); v != "" {
+		port = v
+	}
 
 	addr := fmt.Sprintf("%v:%v", host, port)
 	options := redis.Options{
