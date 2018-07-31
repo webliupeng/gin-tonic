@@ -2,6 +2,7 @@ package utils
 
 import (
 	"fmt"
+	"os"
 
 	"github.com/go-redis/redis"
 )
@@ -10,14 +11,28 @@ var Redis *redis.Client
 
 func init() {
 
-	client := redis.NewClient(&redis.Options{
-		Addr:     fmt.Sprintf("%v:%v", GetConfig().Redis.Host, GetConfig().Redis.Port),
-		Password: GetConfig().Redis.Password, // no password set
-		DB:       0,                          // use default DB
-	})
+	host := GetConfig().Redis.Host
+	port := GetConfig().Redis.Port
+
+	host = os.Getenv("REDIS_HOST")
+	port = os.Getenv("REDIS_PORT")
+
+	addr := fmt.Sprintf("%v:%v", host, port)
+	options := redis.Options{
+		Addr: addr,
+		DB:   0, // use default DB
+	}
+
+	if GetConfig().Redis.Password != "" {
+		options.Password = GetConfig().Redis.Password
+	}
+
+	client := redis.NewClient(&options)
 
 	if _, err := client.Ping().Result(); err != nil {
-		fmt.Println("ping error", err)
+		fmt.Println("ping error", addr, err)
+	} else {
+		fmt.Println("pong")
 	}
 
 	Redis = client
