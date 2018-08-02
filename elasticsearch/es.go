@@ -4,7 +4,6 @@ import (
 	"fmt"
 
 	"github.com/parnurzeal/gorequest"
-	"github.com/webliupeng/gin-tonic/utils"
 )
 
 type Client struct {
