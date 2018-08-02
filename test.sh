@@ -18,8 +18,5 @@ do
     	fi	
     fi
 done
-if [ -n "$COVERALLS" ]
-then
-	#goveralls -coverprofile=acc.out $COVERALLS
-    goveralls -coverprofile=acc.out -service travis-ci -repotoken $COVERALLS_TOKEN
-fi	
+
+goveralls -coverprofile=acc.out -service travis-ci -repotoken $COVERALLS_TOKEN
