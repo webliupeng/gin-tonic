@@ -24,9 +24,10 @@ func (c *Client) post(index string, action string, dsl interface{}) *Result {
 
 	resultBody := &ResultBody{}
 
-	_, _, errs := request.Post(url).Send(&dsl).EndStruct(&resultBody)
-
-	//fmt.Println("POST response body", string(body), errs)
+	resp, body, errs := request.Post(url).Send(&dsl).EndStruct(&resultBody)
+	if resp.StatusCode >= 400 {
+		errs = append(errs, errors.New(string(body)))
+	}
 
 	return &Result{
 		body:   resultBody,
