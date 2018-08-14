@@ -2,7 +2,6 @@ package helpers
 
 import (
 	"encoding/json"
-	"fmt"
 	"net/http"
 
 	"github.com/gin-gonic/gin/binding"
@@ -37,7 +36,6 @@ func Update(name string) gin.HandlerFunc {
 		}
 
 		if err := c.ShouldBindBodyWith(instance, binding.JSON); err == nil {
-			fmt.Printf("after %+v\n", instance)
 			if err := db.DB().Save(instance).Error; err == nil {
 				c.JSON(http.StatusOK, instance)
 			} else {
