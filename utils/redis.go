@@ -3,6 +3,7 @@ package utils
 import (
 	"fmt"
 	"os"
+	"strconv"
 
 	"github.com/go-redis/redis"
 )
@@ -13,6 +14,7 @@ func init() {
 
 	host := GetConfig().Redis.Host
 	port := GetConfig().Redis.Port
+	db := GetConfig().Redis.Db
 
 	if v := os.Getenv("REDIS_HOST"); v != "" {
 		host = v
@@ -22,10 +24,18 @@ func init() {
 		port = v
 	}
 
+	if v := os.Getenv("REDIS_DB"); v != "" {
+		num, err := strconv.Atoi(v)
+		if err != nil {
+			panic(err)
+		}
+		db = num
+	}
+
 	addr := fmt.Sprintf("%v:%v", host, port)
 	options := redis.Options{
 		Addr: addr,
-		DB:   0, // use default DB
+		DB:   db,
 	}
 
 	if GetConfig().Redis.Password != "" {
