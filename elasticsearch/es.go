@@ -2,7 +2,7 @@ package elasticsearch
 
 import (
 	"fmt"
-
+	"errors"
 	"github.com/parnurzeal/gorequest"
 )
 
