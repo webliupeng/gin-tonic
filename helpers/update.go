@@ -2,6 +2,7 @@ package helpers
 
 import (
 	"encoding/json"
+	"fmt"
 	"net/http"
 
 	"github.com/gin-gonic/gin/binding"
@@ -22,9 +23,11 @@ func Update(name string) gin.HandlerFunc {
 			c.ShouldBindBodyWith(&msi, binding.JSON)
 
 			updatedFields := map[string]interface{}{}
-			for _, val := range fields {
-				if msi[val] != nil {
-					updatedFields[val] = msi[val]
+			for key := range msi {
+				if ok, _ := contain(fields, key); ok {
+					updatedFields[key] = msi[key]
+				} else {
+					fmt.Println("[warning]", key, "field does not allow updates")
 				}
 			}
 

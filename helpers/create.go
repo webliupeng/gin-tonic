@@ -2,6 +2,7 @@ package helpers
 
 import (
 	"encoding/json"
+	"fmt"
 	"net/http"
 
 	"github.com/gin-gonic/gin"
@@ -31,12 +32,13 @@ func Create(instanceCreator ModelInstanceCreator) gin.HandlerFunc {
 			}
 
 			insertFields := map[string]interface{}{}
-			for _, val := range fields {
-				if msi[val] != nil {
-					insertFields[val] = msi[val]
+			for key := range msi {
+				if ok, _ := contain(fields, key); ok {
+					insertFields[key] = msi[key]
+				} else {
+					fmt.Println("[warning]", key, "field does not allow inserts")
 				}
 			}
-
 			filterdData, _ := json.Marshal(insertFields)
 
 			c.Set(gin.BodyBytesKey, filterdData)
