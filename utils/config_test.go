@@ -41,7 +41,7 @@ func init() {
 		"redis": {
 			"host": "localhost",
 			"port": "6379",
-			"password": "xxx",
+			"password": "xxx"
 		},
 		"es": {
 			"url": "http://localhost/"
