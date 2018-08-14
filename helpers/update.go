@@ -23,9 +23,11 @@ func Update(name string) gin.HandlerFunc {
 			c.ShouldBindBodyWith(&msi, binding.JSON)
 
 			updatedFields := map[string]interface{}{}
-			for _, val := range fields {
-				if msi[val] != nil {
-					updatedFields[val] = msi[val]
+			for key := range msi {
+				if ok, _ := contain(fields, key); ok {
+					updatedFields[key] = msi[key]
+				} else {
+					fmt.Println("[warning]", key, "field does not allow updates")
 				}
 			}
 
@@ -37,7 +39,6 @@ func Update(name string) gin.HandlerFunc {
 		}
 
 		if err := c.ShouldBindBodyWith(instance, binding.JSON); err == nil {
-			fmt.Printf("after %+v\n", instance)
 			if err := db.DB().Save(instance).Error; err == nil {
 				c.JSON(http.StatusOK, instance)
 			} else {

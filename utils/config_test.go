@@ -13,6 +13,7 @@ func TestExtConfig(t *testing.T) {
 	//defer os.RemoveAll("/tmp/configs")
 
 	config := GetConfig()
+	assert.Equal(t, 0, config.Redis.Db)
 	assert.Equal(t, "bar", config.GetExt("foo").Str())
 	assert.Equal(t, float64(1), config.GetExt("num").Float64())
 }
@@ -40,7 +41,7 @@ func init() {
 		"redis": {
 			"host": "localhost",
 			"port": "6379",
-			"password": "xxx"
+			"password": "xxx",
 		},
 		"es": {
 			"url": "http://localhost/"
