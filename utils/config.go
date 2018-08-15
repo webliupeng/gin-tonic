@@ -27,6 +27,7 @@ type Config struct {
 		Host     string `json:"host"`
 		Port     string `json:"port"`
 		Password string `json:"password"`
+		Db       int    `json:"db"`
 	} `json:"redis"`
 	Open struct {
 		URL string `json:"url"`
