@@ -45,3 +45,7 @@ type Insertable interface {
 type Sortable interface {
 	SortableFields() []string
 }
+
+type IncludableTable interface {
+	IncludableTables() []string
+}

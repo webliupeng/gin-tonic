@@ -25,7 +25,13 @@ type Item struct {
 	gorm.Model
 	Foo    string
 	Bar    string
-	UserID string
+	UserID int
+	User   *User
+}
+
+type User struct {
+	gorm.Model
+	Name string
 }
 
 func (i Item) SortableFields() []string {
@@ -42,6 +48,10 @@ func (i Item) InsertableFields() []string {
 
 func (i Item) FilterableFields() []string {
 	return []string{"foo", "bar", "id"}
+}
+
+func (i Item) IncludableTables() []string {
+	return []string{"user"}
 }
 
 var R *gin.Engine
@@ -62,12 +72,19 @@ func TestList(t *testing.T) {
 }
 
 func TestIncludes(t *testing.T) {
-	req, _ := http.NewRequest("GET", "/users/1/list?.includes=account", nil)
+	req, _ := http.NewRequest("GET", "/users/1/list?.includes=user&.maxResults=1", nil)
 	record := httptest.NewRecorder()
 
 	R.ServeHTTP(record, req)
-
 	assert.Equal(t, record.Code, 200)
+}
+
+func TestIncludeAUnincludableModel(t *testing.T) {
+	req, _ := http.NewRequest("GET", "/users/1/list?.includes=user2&.maxResults=1", nil)
+	record := httptest.NewRecorder()
+
+	R.ServeHTTP(record, req)
+	assert.Equal(t, record.Code, 400)
 }
 
 func TestLike(t *testing.T) {
@@ -80,7 +97,6 @@ func TestLike(t *testing.T) {
 }
 
 func TestGetOne(t *testing.T) {
-
 	item := &Item{}
 	item.Foo = "hah"
 	db.DB().Save(&item)
@@ -122,7 +138,6 @@ func TestInquery(t *testing.T) {
 	rr := &Resp{}
 	json.Unmarshal(record.Body.Bytes(), &rr)
 
-	fmt.Println("fff", record.Body.String())
 	assert.Equal(t, float64(3), rr.Total)
 	assert.Equal(t, record.Code, 200)
 }
@@ -135,11 +150,10 @@ func TestOrderBy(t *testing.T) {
 	rr := &Resp{}
 	json.Unmarshal(record.Body.Bytes(), &rr)
 
-	fmt.Println("fff", record.Body.String())
 	assert.Equal(t, record.Code, 200)
 }
 
-func TestGrantThan(t *testing.T) {
+func TestGreaterThan(t *testing.T) {
 	req, _ := http.NewRequest("GET", "/list?id_gt=2", nil)
 	record := httptest.NewRecorder()
 
@@ -160,16 +174,21 @@ func testRouter() *gin.Engine {
 
 func init() {
 	R = testRouter()
-	db.DB().DropTable(&Item{})
-	err := db.DB().AutoMigrate(&Item{}).Error
+	db.DB().DropTable(&Item{}, &User{})
+	err := db.DB().AutoMigrate(&Item{}, &User{}).Error
 
 	if err != nil {
 		panic(err)
 	}
 
+	user := &User{}
+	user.Name = "tester"
+	db.DB().Save(&user)
+
 	for i := 0; i < 50; i++ {
 		item := &Item{}
 		item.Bar = fmt.Sprintf("bar%v", i)
+		item.UserID = 1
 		db.DB().Save(&item)
 	}
 

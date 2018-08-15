@@ -2,6 +2,7 @@ package helpers
 
 import (
 	"fmt"
+	"net/http"
 	"reflect"
 	"strconv"
 	"strings"
@@ -95,9 +96,24 @@ func List(modelIns interface{}, paramCreators ...CriteriaCreator) gin.HandlerFun
 
 		query := db.DB().Where(strings.Join(expressions, " AND "), values...)
 		if includes := c.Query(".includes"); includes != "" {
-			for _, table := range strings.Split(includes, ",") {
-				query = query.Preload(utils.UpperInitial(table))
+			if includable, ok := modelIns.(db.IncludableTable); ok {
+				tbs := map[string]bool{}
+				for _, val := range includable.IncludableTables() {
+					tbs[val] = true
+				}
+				for _, table := range strings.Split(includes, ",") {
+					if tbs[table] {
+						query = query.Preload(utils.UpperInitial(table))
+					} else {
+						ErrorResponse(c, http.StatusBadRequest, "Can not includes "+table)
+						return
+					}
+				}
+			} else {
+				ErrorResponse(c, http.StatusBadRequest, "Can includes a non-includable model")
+				return
 			}
+
 		}
 
 		pageSize, err := strconv.Atoi(c.DefaultQuery(".maxResults", "10"))
