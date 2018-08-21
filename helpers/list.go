@@ -110,7 +110,7 @@ func List(modelIns interface{}, paramCreators ...CriteriaCreator) gin.HandlerFun
 					}
 				}
 			} else {
-				ErrorResponse(c, http.StatusBadRequest, "Can includes a non-includable model")
+				ErrorResponse(c, http.StatusBadRequest, "Can not includes a non-includable model")
 				return
 			}
 
