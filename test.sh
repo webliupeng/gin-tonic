@@ -19,4 +19,6 @@ do
     fi
 done
 
-goveralls -coverprofile=acc.out -service travis-ci -repotoken $COVERALLS_TOKEN
+if [ "$TRAVIS_PULL_REQUEST" = "false" ]; then 
+	goveralls -coverprofile=acc.out -service travis-ci -repotoken $COVERALLS_TOKEN
+fi
