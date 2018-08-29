@@ -112,7 +112,6 @@ func TestGetOne(t *testing.T) {
 func TestGranterThan(t *testing.T) {
 	req, _ := http.NewRequest("GET", "/list?id_gt=2", nil)
 	record := httptest.NewRecorder()
-
 	R.ServeHTTP(record, req)
 
 	assert.Equal(t, 200, record.Code)
