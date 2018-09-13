@@ -6,7 +6,7 @@ for Dir in $(find ./* -maxdepth 10 -type d ! -path './vendor*');
 do
 	if ls $Dir/*.go &> /dev/null;
 	then
-		returnval=`. ./test.env && go test -coverprofile=profile.out $Dir`
+		returnval=`go test -coverprofile=profile.out $Dir`
 		echo ${returnval}
 		if [[ ${returnval} != *FAIL* ]]
 		then
