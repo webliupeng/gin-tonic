@@ -160,15 +160,24 @@ func ListHandlerWithoutServe(modelIns interface{}, c *gin.Context, paramCreators
 	return total, x.Interface()
 }
 
-// List - Generate a handler to handle response a list
+// List - Generate a handler to handle a list query , if the li
 func List(modelIns interface{}, paramCreators ...CriteriaCreator) gin.HandlerFunc {
-	return func(c *gin.Context) {
-
+	var retFunc gin.HandlerFunc
+	retFunc = func(c *gin.Context) {
+		ptr := reflect.ValueOf(retFunc).Pointer()
+		ptr2 := reflect.ValueOf(c.Handler()).Pointer()
 		total, data := ListHandlerWithoutServe(modelIns, c, paramCreators...)
 
-		c.JSON(200, gin.H{
+		json := gin.H{
 			"total": total,
 			"data":  data,
-		})
+		}
+		if ptr == ptr2 {
+			c.JSON(200, json)
+		} else {
+			c.Set("list", json)
+		}
 	}
+
+	return retFunc
 }

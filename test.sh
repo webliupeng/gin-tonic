@@ -1,11 +1,12 @@
 #!/usr/bin/env bash
+echo "will do all package test"
 
 echo "mode: set" > acc.out
 for Dir in $(find ./* -maxdepth 10 -type d ! -path './vendor*'); 
 do
 	if ls $Dir/*.go &> /dev/null;
 	then
-		returnval=`go test -coverprofile=profile.out $Dir`
+		returnval=`. ./test.env && go test -coverprofile=profile.out $Dir`
 		echo ${returnval}
 		if [[ ${returnval} != *FAIL* ]]
 		then

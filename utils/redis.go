@@ -2,53 +2,44 @@ package utils
 
 import (
 	"fmt"
-	"os"
-	"strconv"
+	"log"
 
 	"github.com/go-redis/redis"
 )
 
-var Redis *redis.Client
+var _redis *redis.Client
 
 func init() {
 
-	host := GetConfig().Redis.Host
-	port := GetConfig().Redis.Port
-	db := GetConfig().Redis.Db
+}
 
-	if v := os.Getenv("REDIS_HOST"); v != "" {
-		host = v
-	}
+func Redis() *redis.Client {
+	if _redis == nil {
+		host := GetConfig().GetString("redis.host")
+		port := GetConfig().GetString("redis.port")
+		db := GetConfig().GetInt("redis.db")
 
-	if v := os.Getenv("REDIS_PORT"); v != "" {
-		port = v
-	}
-
-	if v := os.Getenv("REDIS_DB"); v != "" {
-		num, err := strconv.Atoi(v)
-		if err != nil {
-			panic(err)
+		addr := fmt.Sprintf("%v:%v", host, port)
+		options := redis.Options{
+			Addr: addr,
+			DB:   db,
 		}
-		db = num
+
+		if password := GetConfig().GetString("redis.password"); password != "" {
+			log.Println("redis use auth", password)
+			options.Password = password
+		}
+
+		client := redis.NewClient(&options)
+
+		if _, err := client.Ping().Result(); err != nil {
+			fmt.Println("ping error", addr, err)
+		} else {
+			fmt.Println("pong")
+		}
+
+		_redis = client
 	}
+	return _redis
 
-	addr := fmt.Sprintf("%v:%v", host, port)
-	options := redis.Options{
-		Addr: addr,
-		DB:   db,
-	}
-
-	if GetConfig().Redis.Password != "" {
-		options.Password = GetConfig().Redis.Password
-	}
-
-	client := redis.NewClient(&options)
-
-	if _, err := client.Ping().Result(); err != nil {
-		fmt.Println("ping error", addr, err)
-	} else {
-		fmt.Println("pong")
-	}
-
-	Redis = client
 }

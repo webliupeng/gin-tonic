@@ -57,9 +57,7 @@ func (i Item) IncludableTables() []string {
 var R *gin.Engine
 
 func TestList(t *testing.T) {
-
 	req, _ := http.NewRequest("GET", "/list?.offset=10&.maxResults=10", nil)
-
 	record := httptest.NewRecorder()
 
 	R.ServeHTTP(record, req)
@@ -194,7 +192,13 @@ func init() {
 	item := &Item{}
 	item.Bar = "test_abc"
 	db.DB().Save(&item)
-	R.GET("/list", helpers.List(&Item{}))
+	R.GET("/list",
+		helpers.List(&Item{}),
+		func(c *gin.Context) {
+			if list, e := c.Get("list"); e {
+				c.JSON(200, list)
+			}
+		})
 	R.GET("/list/:id",
 		helpers.FindOneByParam(&Item{}, "id", "item"),
 		helpers.ServeJSONFromContext("item"),

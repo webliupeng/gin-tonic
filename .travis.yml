@@ -14,5 +14,10 @@ before_install:
 script:
  - export ENV=test
  - export CONFIGDIR=/tmp/configs
- - export DB_URI='root@tcp(localhost:3306)/gintonic?charset=utf8mb4&parseTime=true'
+ - export GTC_DB_HOST=locahost
+ - export GTC_DB_PORT=3306
+ - export GTC_DB_USER=root
+ - export GTC_DB_NAME=gintonic
+ - export GTC_REDIS_HOST=localhost
+ - export GTC_REDIS_PORT=6379
  - ./test.sh

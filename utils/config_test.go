@@ -1,6 +1,7 @@
 package utils
 
 import (
+	"fmt"
 	"io/ioutil"
 	"os"
 	"testing"
@@ -13,9 +14,7 @@ func TestExtConfig(t *testing.T) {
 	//defer os.RemoveAll("/tmp/configs")
 
 	config := GetConfig()
-	assert.Equal(t, 0, config.Redis.Db)
-	assert.Equal(t, "bar", config.GetExt("foo").Str())
-	assert.Equal(t, float64(1), config.GetExt("num").Float64())
+	assert.Equal(t, 0, config.GetInt("redis.db"))
 }
 
 func TestCommonFuncs(t *testing.T) {
@@ -24,7 +23,6 @@ func TestCommonFuncs(t *testing.T) {
 }
 
 func init() {
-
 	_ = os.Mkdir("/tmp/configs", 0777)
 
 	text := `{
@@ -36,7 +34,6 @@ func init() {
 			"host":"localhost",
 			"user": "xxx",
 			"password": "C",
-			"port": "3306"
 		},
 		"redis": {
 			"host": "localhost",
@@ -52,8 +49,10 @@ func init() {
 		}
 	}`
 
-	if err := ioutil.WriteFile("/tmp/configs/config.test.json", []byte(text), 0644); err != nil {
+	if err := ioutil.WriteFile("/tmp/configs/config.json", []byte(text), 0644); err != nil {
 		panic(err)
+	} else {
+		fmt.Println("add config")
 	}
 
 }

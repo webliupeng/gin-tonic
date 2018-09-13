@@ -1,13 +1,18 @@
 package utils
 
 import (
-	"encoding/json"
 	"fmt"
-	"io/ioutil"
-	"os"
-	"path"
 
-	"github.com/gin-gonic/gin"
+	"strings"
+
+	"log"
+
+	"flag"
+
+	"os"
+
+	"github.com/fsnotify/fsnotify"
+	"github.com/spf13/viper"
 	"github.com/stretchr/objx"
 )
 
@@ -35,38 +40,66 @@ type Config struct {
 	ES struct {
 		URL string `json:"url"`
 	} `json:"es"`
-
-	Ext interface{} `json:"ext"`
 }
 
 func (c *Config) GetExt(keyPath string) *objx.Value {
-	ext := objx.New(c.Ext)
-	return ext.Get(keyPath)
+	//ext := objx.New(c.Ext)
+	//return ext.Get(keyPath)
+	log.Println("GetExt is deprecated. Use viper.Get to instead")
+	return nil
 }
 
-func GetConfig() Config {
-	ret := Config{}
+var globalConfig = &Config{}
+var configInited = false
 
-	env := os.Getenv("ENV")
+var (
+	configFile = flag.String("c", "", "config file")
+)
 
-	configDir := os.Getenv("CONFIGDIR")
+var viperRuntime = viper.New()
 
-	if configDir == "" {
-		configDir = "./configs"
+func GetConfig() *viper.Viper {
+	if configInited {
+		return viperRuntime
 	}
 
-	if env == "" {
-		env = gin.DebugMode
-	}
+	flag.Parse()
 
-	configFile := path.Join(configDir, "config."+env+".json")
-	if d, err := ioutil.ReadFile(configFile); err == nil {
-		if err := json.Unmarshal(d, &ret); err != nil {
-			fmt.Println("Config format incorrect")
+	viperRuntime.SetConfigName("config")
+	viperRuntime.SetConfigType("json")
+	viperRuntime.AddConfigPath("./")
+
+	var err error
+	if *configFile != "" {
+		if file, err := os.Open(*configFile); err == nil {
+			if err = viperRuntime.ReadConfig(file); err != nil {
+				panic(err)
+			}
 		}
 	} else {
-		fmt.Println("no config file", err)
+		err = viperRuntime.ReadInConfig() // Find and read the config file
 	}
 
-	return ret
+	viperRuntime.SetEnvPrefix("GTC")
+	viperRuntime.AutomaticEnv()
+	viperRuntime.SetEnvKeyReplacer(strings.NewReplacer(".", "_"))
+
+	viperRuntime.Unmarshal(globalConfig)
+	if err != nil { // Handle errors reading the config file
+		fmt.Println(fmt.Errorf("Fatal error config file: %s", err))
+		fmt.Println("db host", viper.Get("db.host"), globalConfig.Db.Host)
+	} else {
+		if !configInited {
+
+			configInited = true
+
+			viperRuntime.WatchConfig()
+			viperRuntime.OnConfigChange(func(in fsnotify.Event) {
+				log.Println("config file change")
+				//viper.Unmarshal(globalConfig)
+			})
+		}
+	}
+
+	return viperRuntime
 }
