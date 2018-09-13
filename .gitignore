@@ -1,3 +1,4 @@
 vendor
 test.rc
 .vscode
+test.env

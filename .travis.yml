@@ -14,7 +14,7 @@ before_install:
 script:
  - export ENV=test
  - export CONFIGDIR=/tmp/configs
- - export GTC_DB_HOST=locahost
+ - export GTC_DB_HOST=localhost
  - export GTC_DB_PORT=3306
  - export GTC_DB_USER=root
  - export GTC_DB_NAME=gintonic
