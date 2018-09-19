@@ -2,6 +2,8 @@ package utils
 
 import (
 	"fmt"
+	"path"
+	"path/filepath"
 
 	"strings"
 
@@ -65,18 +67,24 @@ func GetConfig() *viper.Viper {
 
 	flag.Parse()
 
-	viperRuntime.SetConfigName("config")
 	viperRuntime.SetConfigType("json")
-	viperRuntime.AddConfigPath("./")
-
 	var err error
-	if *configFile != "" {
+	if *configFile != "" { // 参数指定了配置文件
 		if file, err := os.Open(*configFile); err == nil {
+			log.Println("read specified config file", *configFile)
 			if err = viperRuntime.ReadConfig(file); err != nil {
 				panic(err)
 			}
 		}
+
+		viperRuntime.AddConfigPath(path.Dir(*configFile))
+		var basename = filepath.Base(*configFile)
+		var extension = filepath.Ext(basename)
+		var configname = basename[0 : len(basename)-len(extension)]
+		viperRuntime.SetConfigName(configname)
 	} else {
+		viperRuntime.SetConfigName("config")
+		viperRuntime.AddConfigPath("./")
 		err = viperRuntime.ReadInConfig() // Find and read the config file
 	}
 
@@ -87,7 +95,6 @@ func GetConfig() *viper.Viper {
 	viperRuntime.Unmarshal(globalConfig)
 	if err != nil { // Handle errors reading the config file
 		fmt.Println(fmt.Errorf("Fatal error config file: %s", err))
-		fmt.Println("db host", viper.Get("db.host"), globalConfig.Db.Host)
 	} else {
 		if !configInited {
 
@@ -96,7 +103,6 @@ func GetConfig() *viper.Viper {
 			viperRuntime.WatchConfig()
 			viperRuntime.OnConfigChange(func(in fsnotify.Event) {
 				log.Println("config file change")
-				//viper.Unmarshal(globalConfig)
 			})
 		}
 	}

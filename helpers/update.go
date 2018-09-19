@@ -4,6 +4,7 @@ import (
 	"encoding/json"
 	"fmt"
 	"net/http"
+	"reflect"
 
 	"github.com/gin-gonic/gin/binding"
 
@@ -13,7 +14,12 @@ import (
 
 // Update - Generate a handler to handle update request
 func Update(name string) gin.HandlerFunc {
-	return func(c *gin.Context) {
+
+	var retFunc gin.HandlerFunc
+	retFunc = func(c *gin.Context) {
+		currentHp := reflect.ValueOf(retFunc).Pointer()
+		mainHp := reflect.ValueOf(c.Handler()).Pointer()
+
 		instance, _ := c.Get(name)
 
 		if updateable, ok := instance.(db.Updatable); ok {
@@ -40,7 +46,12 @@ func Update(name string) gin.HandlerFunc {
 
 		if err := c.ShouldBindBodyWith(instance, binding.JSON); err == nil {
 			if err := db.DB().Save(instance).Error; err == nil {
-				c.JSON(http.StatusOK, instance)
+
+				if currentHp == mainHp {
+					c.JSON(http.StatusOK, instance)
+				} else {
+					c.Set("updated", instance)
+				}
 			} else {
 				ErrorResponse(c, http.StatusInternalServerError, err.Error())
 			}
@@ -48,4 +59,5 @@ func Update(name string) gin.HandlerFunc {
 			ErrorResponse(c, http.StatusUnprocessableEntity, err.Error())
 		}
 	}
+	return retFunc
 }
