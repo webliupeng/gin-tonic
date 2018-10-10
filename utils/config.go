@@ -4,6 +4,7 @@ import (
 	"fmt"
 	"path"
 	"path/filepath"
+	"sync"
 
 	"strings"
 
@@ -60,12 +61,15 @@ var (
 
 var viperRuntime = viper.New()
 
+var once sync.Once
+
 func GetConfig() *viper.Viper {
 	if configInited {
 		return viperRuntime
 	}
-
-	flag.Parse()
+	once.Do(func() {
+		flag.Parse()
+	})
 
 	viperRuntime.SetConfigType("json")
 	var err error
