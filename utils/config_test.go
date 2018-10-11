@@ -22,6 +22,17 @@ func TestCommonFuncs(t *testing.T) {
 	assert.Equal(t, "Foo", UpperInitial("foo"))
 }
 
+func TestConfigThreadSafe(t *testing.T) {
+
+	for i := 0; i < 10000; i++ {
+		go func() {
+			c := GetConfig()
+
+			fmt.Println("...", c.Get("db.host"))
+		}()
+	}
+}
+
 func init() {
 	_ = os.Mkdir("/tmp/configs", 0777)
 

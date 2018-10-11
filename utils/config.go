@@ -4,6 +4,7 @@ import (
 	"fmt"
 	"path"
 	"path/filepath"
+	"sync"
 
 	"strings"
 
@@ -60,10 +61,15 @@ var (
 
 var viperRuntime = viper.New()
 
+var locker sync.Mutex
+
 func GetConfig() *viper.Viper {
 	if configInited {
 		return viperRuntime
 	}
+
+	locker.Lock()
+	defer locker.Unlock()
 
 	flag.Parse()
 
