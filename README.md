@@ -44,7 +44,7 @@ func (f *Foo)FilterableFields() []string {
 ```
 
 
-*List Handelr Example*
+*List Handler Example*
 ```go
 import (
 	"github.com/webliupeng/gin-tonic/helpers"
@@ -56,7 +56,7 @@ router.Get("/customers", helpers.List(&Customer{}))
 curl yourdomain/customers?.maxResults=100&.offset=10 # equals LIMIT 10, 100
 curl yourdomain/customers?age_lt=10
 ```
-*Create Handelr Example*
+*Create Handler Example*
 
 ```go
 router.Post("/customer", helpers.Create(func(c *gin.Context) interface{} {
