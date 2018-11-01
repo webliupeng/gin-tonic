@@ -150,3 +150,15 @@ func TestEs(t *testing.T) {
 	})
 	assert.Equal(t, 10, len(res2.Body().Hits.Hits))
 }
+
+func TestEsErrors(t *testing.T) {
+
+	ts := httptest.NewServer(&mockServer{})
+	defer ts.Close()
+	client := elasticsearch.NewClient(ts.URL + "/")
+
+	res := client.Count("not_found_index", gin.H{})
+
+	assert.NotEmpty(t, res.Errors())
+
+}

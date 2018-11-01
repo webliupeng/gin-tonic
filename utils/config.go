@@ -16,7 +16,6 @@ import (
 
 	"github.com/fsnotify/fsnotify"
 	"github.com/spf13/viper"
-	"github.com/stretchr/objx"
 )
 
 type Config struct {
@@ -45,18 +44,11 @@ type Config struct {
 	} `json:"es"`
 }
 
-func (c *Config) GetExt(keyPath string) *objx.Value {
-	//ext := objx.New(c.Ext)
-	//return ext.Get(keyPath)
-	log.Println("GetExt is deprecated. Use viper.Get to instead")
-	return nil
-}
-
 var globalConfig = &Config{}
 var configInited = false
 
 var (
-	configFile = flag.String("c", "", "config file")
+	ConfigFile = flag.String("c", "", "config file")
 )
 
 var viperRuntime = viper.New()
@@ -75,16 +67,16 @@ func GetConfig() *viper.Viper {
 
 	viperRuntime.SetConfigType("json")
 	var err error
-	if *configFile != "" { // 参数指定了配置文件
-		if file, err := os.Open(*configFile); err == nil {
-			log.Println("read specified config file", *configFile)
+	if *ConfigFile != "" { // 参数指定了配置文件
+		if file, err := os.Open(*ConfigFile); err == nil {
+			log.Println("read specified config file", *ConfigFile)
 			if err = viperRuntime.ReadConfig(file); err != nil {
 				panic(err)
 			}
 		}
 
-		viperRuntime.AddConfigPath(path.Dir(*configFile))
-		var basename = filepath.Base(*configFile)
+		viperRuntime.AddConfigPath(path.Dir(*ConfigFile))
+		var basename = filepath.Base(*ConfigFile)
 		var extension = filepath.Ext(basename)
 		var configname = basename[0 : len(basename)-len(extension)]
 		viperRuntime.SetConfigName(configname)
@@ -103,9 +95,7 @@ func GetConfig() *viper.Viper {
 		fmt.Println(fmt.Errorf("Fatal error config file: %s", err))
 	} else {
 		if !configInited {
-
 			configInited = true
-
 			viperRuntime.WatchConfig()
 			viperRuntime.OnConfigChange(func(in fsnotify.Event) {
 				log.Println("config file change")

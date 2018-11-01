@@ -1,11 +1,13 @@
 package helpers
 
 import (
+	"errors"
 	"fmt"
-	"net/http"
 	"reflect"
 	"strconv"
 	"strings"
+
+	"github.com/jinzhu/gorm"
 
 	"github.com/gin-gonic/gin"
 	"github.com/webliupeng/gin-tonic/db"
@@ -18,20 +20,36 @@ type condition struct {
 }
 
 // CriteriaCreator - 条件构造
-type CriteriaCreator func(c *gin.Context) (string, string)
+type CriteriaCreator func(db *gorm.DB, c *gin.Context) *gorm.DB
 
 func CriteriaByParam(key string) CriteriaCreator {
-	f := func(c *gin.Context) (string, string) {
+	f := func(db *gorm.DB, c *gin.Context) *gorm.DB {
 		if val, ok := c.Params.Get(key); ok {
-			return key, val
-		} else {
-			return key, ""
+			return db.Where(key+" = ?", val)
 		}
+		return db
 	}
 	return f
 }
 
-func ListHandlerWithoutServe(modelIns interface{}, c *gin.Context, paramCreators ...CriteriaCreator) (int, interface{}) {
+// func BuildPaginion(db *gorm.DB, c *gin.Context) {
+
+//  pageSize, err := strconv.Atoi(c.DefaultQuery(".maxResults", "10"))
+//  offset, err2 := strconv.Atoi(c.DefaultQuery(".offset", "0"))
+//  if pageSize > 1000 {
+//   panic("page size too large")
+//  }
+//  if err != nil {
+//   panic(err)
+//  }
+
+//  if err2 != nil {
+//   panic(err2)
+//  }
+
+// }
+
+func BuildQueryDB(modelIns interface{}, c *gin.Context) (*gorm.DB, error) {
 	myType := reflect.TypeOf(modelIns)
 
 	slice := reflect.MakeSlice(reflect.SliceOf(myType), 0, 0)
@@ -39,7 +57,6 @@ func ListHandlerWithoutServe(modelIns interface{}, c *gin.Context, paramCreators
 	x.Elem().Set(slice)
 
 	expressions := []string{}
-
 	values := []interface{}{}
 
 	filterableFields := []string{}
@@ -86,12 +103,6 @@ func ListHandlerWithoutServe(modelIns interface{}, c *gin.Context, paramCreators
 		}
 	}
 
-	for _, paramCreator := range paramCreators {
-		key, value := paramCreator(c)
-		expressions = append(expressions, fmt.Sprintf("%v = ?", key))
-		values = append(values, value)
-	}
-
 	query := db.DB().Where(strings.Join(expressions, " AND "), values...)
 	if includes := c.Query(".includes"); includes != "" {
 		if includable, ok := modelIns.(db.IncludableTable); ok {
@@ -103,13 +114,11 @@ func ListHandlerWithoutServe(modelIns interface{}, c *gin.Context, paramCreators
 				if tbs[table] {
 					query = query.Preload(utils.UpperInitial(table))
 				} else {
-					ErrorResponse(c, http.StatusBadRequest, "Can not includes "+table)
-					return 0, nil
+					return nil, errors.New("Can not includes " + table)
 				}
 			}
 		} else {
-			ErrorResponse(c, http.StatusBadRequest, "Can not includes a non-includable model")
-			return 0, nil
+			return nil, errors.New("Can not includes a non-includable model")
 		}
 	}
 
@@ -153,30 +162,73 @@ func ListHandlerWithoutServe(modelIns interface{}, c *gin.Context, paramCreators
 		}
 	}
 
-	var total int
-
-	query.Limit(pageSize).Offset(offset).Find(x.Interface())
-	db.DB().Model(x.Interface()).Where(strings.Join(expressions, " AND "), values...).Count(&total)
-	return total, x.Interface()
+	return query.Limit(pageSize).Offset(offset), nil
 }
 
-// List - Generate a handler to handle a list query , if the li
+// ListHandlerWithoutServe -
+// Deprecated: use BuildQueryDB to instead
+func ListHandlerWithoutServe(modelIns interface{}, c *gin.Context, paramCreators ...CriteriaCreator) (int, interface{}) {
+	myType := reflect.TypeOf(modelIns)
+	slice := reflect.MakeSlice(reflect.SliceOf(myType), 0, 0)
+	x := reflect.New(slice.Type())
+	if query, err := BuildQueryDB(modelIns, c); err == nil {
+		for _, paramCreator := range paramCreators {
+			query = paramCreator(query, c)
+		}
+
+		query.Find(x.Interface())
+
+		var total int
+		query.Model(modelIns).Count(&total)
+
+		//total, data := ListHandlerWithoutServe(modelIns, c, paramCreators...)
+		return total, x.Interface()
+	} else {
+		ErrorResponse(c, 400, err.Error())
+	}
+
+	return 0, nil
+}
+
+// List - Generate a handler to handle a list query.
 func List(modelIns interface{}, paramCreators ...CriteriaCreator) gin.HandlerFunc {
 	var retFunc gin.HandlerFunc
 	retFunc = func(c *gin.Context) {
 		ptr := reflect.ValueOf(retFunc).Pointer()
 		ptr2 := reflect.ValueOf(c.Handler()).Pointer()
-		total, data := ListHandlerWithoutServe(modelIns, c, paramCreators...)
 
-		json := gin.H{
-			"total": total,
-			"data":  data,
-		}
-		if ptr == ptr2 {
-			c.JSON(200, json)
+		myType := reflect.TypeOf(modelIns)
+
+		slice := reflect.MakeSlice(reflect.SliceOf(myType), 0, 0)
+		x := reflect.New(slice.Type())
+		x.Elem().Set(slice)
+
+		if query, err := BuildQueryDB(modelIns, c); err == nil {
+			for _, paramCreator := range paramCreators {
+				query = paramCreator(query, c)
+			}
+
+			query.Find(x.Interface())
+
+			var total int
+			query.Model(modelIns).Count(&total)
+
+			//total, data := ListHandlerWithoutServe(modelIns, c, paramCreators...)
+
+			json := gin.H{
+				"total": total,
+				"data":  x.Interface(),
+			}
+
+			if ptr == ptr2 {
+				c.JSON(200, json)
+			} else {
+				c.Set("list", json)
+			}
 		} else {
-			c.Set("list", json)
+			ErrorResponse(c, 400, err.Error())
 		}
+
 	}
 
 	return retFunc

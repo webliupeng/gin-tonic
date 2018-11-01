@@ -3,7 +3,6 @@ package utils
 import (
 	"fmt"
 	"io/ioutil"
-	"os"
 	"testing"
 
 	"github.com/stretchr/testify/assert"
@@ -18,7 +17,6 @@ func TestExtConfig(t *testing.T) {
 }
 
 func TestCommonFuncs(t *testing.T) {
-
 	assert.Equal(t, "Foo", UpperInitial("foo"))
 }
 
@@ -26,15 +24,27 @@ func TestConfigThreadSafe(t *testing.T) {
 
 	for i := 0; i < 10000; i++ {
 		go func() {
-			c := GetConfig()
+			_ = GetConfig()
 
-			fmt.Println("...", c.Get("db.host"))
+			//fmt.Println("...", c.Get("db.host"))
+		}()
+	}
+}
+
+func TestFileConfig(t *testing.T) {
+	*ConfigFile = "./config.json"
+	configInited = false
+	for i := 0; i < 10000; i++ {
+		go func() {
+			_ = GetConfig()
+
+			//fmt.Println("...", c.Get("db.host"))
 		}()
 	}
 }
 
 func init() {
-	_ = os.Mkdir("/tmp/configs", 0777)
+	//_ = os.Mkdir("/tmp/configs", 0777)
 
 	text := `{
 		"app": {
@@ -44,7 +54,7 @@ func init() {
 			"name": "test",
 			"host":"localhost",
 			"user": "xxx",
-			"password": "C",
+			"password": "C"
 		},
 		"redis": {
 			"host": "localhost",
@@ -60,7 +70,7 @@ func init() {
 		}
 	}`
 
-	if err := ioutil.WriteFile("/tmp/configs/config.json", []byte(text), 0644); err != nil {
+	if err := ioutil.WriteFile("./config.json", []byte(text), 0644); err != nil {
 		panic(err)
 	} else {
 		fmt.Println("add config")

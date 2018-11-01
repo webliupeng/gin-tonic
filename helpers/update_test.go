@@ -15,6 +15,8 @@ import (
 func TestUpdate(t *testing.T) {
 
 	item := &Item{}
+
+	db.DB().Debug().Where("foo = ?", 1).Where("id > ?", 3).Find(&item)
 	db.DB().First(&item)
 	req, _ := http.NewRequest("PUT", fmt.Sprintf("/list/%d", item.ID), bytes.NewReader([]byte(`{
 		"foo":"REPLY"

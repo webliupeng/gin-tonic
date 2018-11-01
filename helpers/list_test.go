@@ -69,6 +69,19 @@ func TestList(t *testing.T) {
 	assert.Equal(t, record.Code, 200)
 }
 
+func TestListWithoutServe(t *testing.T) {
+	req, _ := http.NewRequest("GET", "/list2?.offset=10&.maxResults=10", nil)
+	record := httptest.NewRecorder()
+
+	R.ServeHTTP(record, req)
+
+	//println("limited", record.Body.String())
+	obj, _ := objx.FromJSON(record.Body.String())
+
+	assert.Equal(t, 10, len(obj.Get("data").InterSlice()))
+	assert.Equal(t, record.Code, 200)
+}
+
 func TestIncludes(t *testing.T) {
 	req, _ := http.NewRequest("GET", "/users/1/list?.includes=user&.maxResults=1", nil)
 	record := httptest.NewRecorder()
@@ -82,7 +95,7 @@ func TestIncludeAUnincludableModel(t *testing.T) {
 	record := httptest.NewRecorder()
 
 	R.ServeHTTP(record, req)
-	assert.Equal(t, record.Code, 400)
+	assert.Equal(t, 400, record.Code)
 }
 
 func TestLike(t *testing.T) {
@@ -199,10 +212,20 @@ func init() {
 				c.JSON(200, list)
 			}
 		})
+	R.GET("/list2", func(c *gin.Context) {
+		total, xxx := helpers.ListHandlerWithoutServe(&Item{}, c)
+
+		c.JSON(200, gin.H{
+			"total": total,
+			"data":  xxx,
+		})
+
+	})
 	R.GET("/list/:id",
 		helpers.FindOneByParam(&Item{}, "id", "item"),
 		helpers.ServeJSONFromContext("item"),
 	)
+
 	R.GET("/users/:user_id/list",
 		helpers.List(&Item{}, helpers.CriteriaByParam("user_id")),
 	)

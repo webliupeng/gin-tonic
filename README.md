@@ -1,36 +1,93 @@
 [![Build Status](https://travis-ci.org/webliupeng/gin-tonic.svg?branch=master)](https://travis-ci.org/webliupeng/gin-tonic) [![Coverage Status](https://coveralls.io/repos/github/webliupeng/gin-tonic/badge.svg?branch=master)](https://coveralls.io/github/webliupeng/gin-tonic?branch=master)
 
-Gin-tonic is inspired by redstone's open-rest project which helps developers building CRUD APIs with Gin and GORM fastly. 
+Gin-tonic is inspired by redstone's [Open-Rest](https://github.com/open-node/open-rest) project which helps developers building CRUD APIs with Gin and [GORM](https://github.com/jinzhu/gorm) fastly. 
 
 **Features**
-- Genrate list filterable handler
-- Genrate delete handler
-- Genrate detail handler 
-- Genrate create handler with Gin's validation
-- Genrate update handler with Gin's validation
+- Generate list handler
+- Generate delete handler
+- Generate detail handler 
+- Generate create handler with Gin's validation
+- Generate update handler with Gin's validation
+- Integrate [Viper](https://github.com/spf13/viper) to read configuration
+
+**Quick start**
+
+*Define model*
+
+*implement accessible interfaces to expose model CRUD behaviors
+```go
+type Customer struct {
+  Name string
+  Age uint
+  Address string
+}
+
+// define the model only allows 'age','name' and 'name' fields can be insert
+func (f *Foo)InsertableFields() []string {
+	return []string{"age", "name", "address"}
+}
+
+// define the model only allows 'age' and 'address' fields can be update.
+func (f *Foo)UpdateableFields() []string {
+	return []string{"age", "address"}
+}
+
+// define the model only allows 'age' to sort
+func (f *Foo)SortableFields() []string {
+	return []string{"age"}
+}
+
+// define the model only allows 'age','name','address' to filter
+func (f *Foo)FilterableFields() []string {
+	return []string{"age", "name", "address"}
+}
+```
 
 
-**USAGE**
-
+*List Handelr Example*
 ```go
 import (
 	"github.com/webliupeng/gin-tonic/helpers"
 )
 
-type Foo struct {
-	Bar string
-}
-func (f *Foo)InsertableFields() []string {
-	return []string{"bar"}
-}
+router.Get("/customers", helpers.List(&Customer{}))
+```
+```shell
+curl yourdomain/customers?.maxResults=100&.offset=10 # equals LIMIT 10, 100
+curl yourdomain/customers?age_lt=10
+```
+*Create Handelr Example*
 
-func (f *Foo)UpdateableFields() []string {
-	return []string{"bar"}
-}
+```go
+router.Post("/customer", helpers.Create(func(c *gin.Context) interface{} {
+  customer := &Customers{}
 
-router.POST("/posts", helpers.Create(func(c *gin.Context){ return &Foo{} }))
-router.GET("/posts", helpers.List(&Foo{}))
-router.GET("/posts/:id", helpers.FindOneByParam(&Foo{}, "id", "foo"), helpers.ServeJSONFromContext("foo"))
-router.DELETE("/posts/:id", helpers.FindOneByParam(&Foo{}, "id", "foo"), helpers.Delete("foo"))
-router.PUT("/posts/:id", helpers.FindOneByParam(&Foo{}, "id", "foo"), helpers.Update("foo"))
+  // set default values here.
+  return customer
+}))
+```
+
+```shell
+curl --header "Content-Type: application/json" \
+  --request POST \
+  --data '{"name": "a"}' \
+  http://yourdomain/customers
+
+```
+*Update Handler Example*
+
+```go
+router.Put("/customers/:id", 
+  helpers.FindOne(&Customer{}, "id", "customer"), // find a record by params 'id' and store the result to gin's Context
+  helpers.Update("customer") // update the record by context name 
+)
+```
+
+*Delete Handler Example* 
+```go
+router.Put("/customers/:id", 
+  helpers.FindOne(&Customer{}, "id", "customer"), // find a record by params 'id' and store the result to gin's Context
+  helpers.Delete("customer") // delete the record by context name 
+)
+
 ```

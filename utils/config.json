@@ -1,0 +1,23 @@
+{
+		"app": {
+			"port": "8001"
+		},
+		"db": {
+			"name": "test",
+			"host":"localhost",
+			"user": "xxx",
+			"password": "C"
+		},
+		"redis": {
+			"host": "localhost",
+			"port": "6379",
+			"password": "xxx"
+		},
+		"es": {
+			"url": "http://localhost/"
+		},
+		"ext": {
+			"foo": "bar",
+			"num": 1
+		}
+	}
