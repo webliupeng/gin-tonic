@@ -26,10 +26,6 @@ func contain(target interface{}, obj interface{}) (bool, error) {
 				return true, nil
 			}
 		}
-	case reflect.Map:
-		if targetValue.MapIndex(reflect.ValueOf(obj)).IsValid() {
-			return true, nil
-		}
 	}
 
 	return false, errors.New("not in array")
