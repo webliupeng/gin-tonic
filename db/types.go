@@ -7,26 +7,24 @@ import (
 
 type JSONArray []interface{}
 
-func (t *JSONArray) Scan(v interface{}) error {
+func (t *JSONArray) Scan(v interface{}) (err error) {
 	// Should be more strictly to check this type.
 	if b, ok := v.([]byte); ok {
 		ret := JSONArray{}
-		if err := json.Unmarshal(b, &ret); err == nil {
+
+		err = json.Unmarshal(b, &ret)
+
+		if err == nil {
 			*t = ret
-			return nil
-		} else {
-			panic(err)
 		}
 	}
-	return nil
+	return
 }
 
-func (t JSONArray) Value() (driver.Value, error) {
-	if b, err := json.Marshal(t); err == nil {
-		return driver.Value(string(b)), nil
-	} else {
-		return nil, err
-	}
+func (t JSONArray) Value() (val driver.Value, err error) {
+	val, err = json.Marshal(t)
+
+	return
 }
 
 type Filterable interface {

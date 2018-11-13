@@ -34,10 +34,7 @@ func Redis() *redis.Client {
 
 		if _, err := client.Ping().Result(); err != nil {
 			fmt.Println("ping error", addr, err)
-		} else {
-			fmt.Println("pong")
 		}
-
 		_redis = client
 	}
 	return _redis

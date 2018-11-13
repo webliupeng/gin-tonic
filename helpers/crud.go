@@ -34,7 +34,7 @@ func FindOneByParam(modelIns interface{}, paramName string, contextName string) 
 				c.AbortWithStatusJSON(http.StatusInternalServerError, gin.H{"message": err.Error()})
 			}
 		} else {
-			c.AbortWithError(http.StatusUnprocessableEntity, errors.New("need account id param"))
+			c.AbortWithError(http.StatusUnprocessableEntity, errors.New("need a param to query"))
 		}
 	}
 }
@@ -51,7 +51,7 @@ func Should(args ...func(*gin.Context) bool) gin.HandlerFunc {
 			}
 		}
 		if !pass {
-			c.AbortWithStatusJSON(http.StatusUnauthorized, gin.H{"message": "Unauthorized"})
+			c.AbortWithStatusJSON(http.StatusForbidden, gin.H{"message": "Unauthorized"})
 		}
 	}
 }

@@ -11,7 +11,6 @@ import (
 
 	"github.com/gin-gonic/gin"
 	"github.com/webliupeng/gin-tonic/db"
-	"github.com/webliupeng/gin-tonic/utils"
 )
 
 type condition struct {
@@ -89,10 +88,10 @@ func BuildQueryDB(modelIns interface{}, c *gin.Context) (*gorm.DB, error) {
 	}
 
 	for _, field := range filterableFields {
-		if fieldValue := c.Query(field); len(fieldValue) > 0 {
-			expressions = append(expressions, field+"= ?")
-			values = append(values, fieldValue)
-		}
+		// if fieldValue := c.Query(field); len(fieldValue) > 0 {
+		// 	expressions = append(expressions, field+"= ?")
+		// 	values = append(values, fieldValue)
+		// }
 		for opr, handle := range oparators {
 			if val := c.Query(fmt.Sprintf("%v_%v", field, opr)); val != "" {
 				expression, qv := handle(field, val)
@@ -112,7 +111,7 @@ func BuildQueryDB(modelIns interface{}, c *gin.Context) (*gorm.DB, error) {
 			}
 			for _, table := range strings.Split(includes, ",") {
 				if tbs[table] {
-					query = query.Preload(utils.UpperInitial(table))
+					query = query.Preload(strings.Title(table))
 				} else {
 					return nil, errors.New("Can not includes " + table)
 				}

@@ -16,16 +16,10 @@ func TestExtConfig(t *testing.T) {
 	assert.Equal(t, 0, config.GetInt("redis.db"))
 }
 
-func TestCommonFuncs(t *testing.T) {
-	assert.Equal(t, "Foo", UpperInitial("foo"))
-}
-
 func TestConfigThreadSafe(t *testing.T) {
-
 	for i := 0; i < 10000; i++ {
 		go func() {
 			_ = GetConfig()
-
 			//fmt.Println("...", c.Get("db.host"))
 		}()
 	}
@@ -35,11 +29,7 @@ func TestFileConfig(t *testing.T) {
 	*ConfigFile = "./config.json"
 	configInited = false
 	for i := 0; i < 10000; i++ {
-		go func() {
-			_ = GetConfig()
-
-			//fmt.Println("...", c.Get("db.host"))
-		}()
+		go func() { _ = GetConfig() }()
 	}
 }
 

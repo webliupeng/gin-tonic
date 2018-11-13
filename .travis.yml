@@ -1,6 +1,7 @@
 language: go
 services:
   - mysql
+  - redis
 go: 
  - 1.9.x
 

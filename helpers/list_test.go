@@ -26,6 +26,7 @@ type Item struct {
 	Foo    string
 	Bar    string
 	UserID int
+	Age    int
 	User   *User
 }
 
@@ -39,7 +40,7 @@ func (i Item) SortableFields() []string {
 }
 
 func (i Item) UpdatableFields() []string {
-	return []string{"foo", "bar"}
+	return []string{"foo", "bar", "age"}
 }
 
 func (i Item) InsertableFields() []string {
@@ -61,8 +62,6 @@ func TestList(t *testing.T) {
 	record := httptest.NewRecorder()
 
 	R.ServeHTTP(record, req)
-
-	//println("limited", record.Body.String())
 	obj, _ := objx.FromJSON(record.Body.String())
 
 	assert.Equal(t, 10, len(obj.Get("data").InterSlice()))
@@ -79,6 +78,32 @@ func TestListWithoutServe(t *testing.T) {
 	obj, _ := objx.FromJSON(record.Body.String())
 
 	assert.Equal(t, 10, len(obj.Get("data").InterSlice()))
+	assert.Equal(t, record.Code, 200)
+}
+
+func TestListLt(t *testing.T) {
+	req, _ := http.NewRequest("GET", "/list2?id_lt=2", nil)
+	record := httptest.NewRecorder()
+
+	R.ServeHTTP(record, req)
+
+	//println("limited", record.Body.String())
+	obj, _ := objx.FromJSON(record.Body.String())
+
+	assert.Equal(t, 1, len(obj.Get("data").InterSlice()))
+	assert.Equal(t, record.Code, 200)
+}
+
+func TestListLte(t *testing.T) {
+	req, _ := http.NewRequest("GET", "/list2?id_lte=2", nil)
+	record := httptest.NewRecorder()
+
+	R.ServeHTTP(record, req)
+
+	//println("limited", record.Body.String())
+	obj, _ := objx.FromJSON(record.Body.String())
+
+	assert.Equal(t, 2, len(obj.Get("data").InterSlice()))
 	assert.Equal(t, record.Code, 200)
 }
 

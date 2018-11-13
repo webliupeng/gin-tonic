@@ -19,14 +19,16 @@ func Update(name string) gin.HandlerFunc {
 	retFunc = func(c *gin.Context) {
 		currentHp := reflect.ValueOf(retFunc).Pointer()
 		mainHp := reflect.ValueOf(c.Handler()).Pointer()
-
 		instance, _ := c.Get(name)
 
 		if updateable, ok := instance.(db.Updatable); ok {
 			fields := updateable.UpdatableFields()
 			msi := map[string]interface{}{}
 
-			c.ShouldBindBodyWith(&msi, binding.JSON)
+			if err := c.ShouldBindBodyWith(&msi, binding.JSON); err != nil {
+				ErrorResponse(c, http.StatusBadRequest, err.Error())
+				return
+			}
 
 			updatedFields := map[string]interface{}{}
 			for key := range msi {
@@ -42,11 +44,11 @@ func Update(name string) gin.HandlerFunc {
 			c.Set(gin.BodyBytesKey, filterdData)
 		} else {
 			ErrorResponse(c, http.StatusForbidden, "Can not update this resource")
+			return
 		}
 
 		if err := c.ShouldBindBodyWith(instance, binding.JSON); err == nil {
 			if err := db.DB().Save(instance).Error; err == nil {
-
 				if currentHp == mainHp {
 					c.JSON(http.StatusOK, instance)
 				} else {

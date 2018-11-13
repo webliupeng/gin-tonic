@@ -13,7 +13,7 @@ func main() {
 
 	e := gin.Default()
 
-	utils.Redis().Get("ab")
+	// utils.Redis().Get("ab")
 
 	e.Run(":9911")
 }

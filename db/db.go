@@ -12,14 +12,10 @@ import (
 
 var db *gorm.DB
 
-func init() {
-
-}
-
-// DB - DB will run a gorm.DB pointer
+// DB - DB will run a gorm.DB's pointer
 func DB() *gorm.DB {
+	config := utils.GetConfig()
 	if db == nil {
-		config := utils.GetConfig()
 		var err error
 
 		cs := os.Getenv("DB_URI")
@@ -39,9 +35,13 @@ func DB() *gorm.DB {
 		db.DB().SetMaxIdleConns(20)
 		db.DB().SetConnMaxLifetime(time.Duration(10) * time.Minute)
 		if err != nil {
-			fmt.Println("bad connection", cs)
 			panic(err)
 		}
 	}
-	return db
+
+	if config.GetString("db.debug") == "true" {
+		return db.Debug()
+	} else {
+		return db
+	}
 }
