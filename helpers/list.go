@@ -97,7 +97,6 @@ func BuildQueryDB(modelIns interface{}, c *gin.Context) (*gorm.DB, error) {
 				expression, qv := handle(field, val)
 				expressions = append(expressions, expression)
 				values = append(values, qv)
-				break
 			}
 		}
 	}
