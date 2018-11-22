@@ -88,15 +88,16 @@ func BuildQueryDB(modelIns interface{}, c *gin.Context) (*gorm.DB, error) {
 	}
 
 	for _, field := range filterableFields {
-		// if fieldValue := c.Query(field); len(fieldValue) > 0 {
-		// 	expressions = append(expressions, field+"= ?")
-		// 	values = append(values, fieldValue)
-		// }
-		for opr, handle := range oparators {
-			if val := c.Query(fmt.Sprintf("%v_%v", field, opr)); val != "" {
-				expression, qv := handle(field, val)
-				expressions = append(expressions, expression)
-				values = append(values, qv)
+		if fieldValue := c.Query(field); len(fieldValue) > 0 {
+			expressions = append(expressions, field+"= ?")
+			values = append(values, fieldValue)
+		} else {
+			for opr, handle := range oparators {
+				if val := c.Query(fmt.Sprintf("%v_%v", field, opr)); val != "" {
+					expression, qv := handle(field, val)
+					expressions = append(expressions, expression)
+					values = append(values, qv)
+				}
 			}
 		}
 	}
