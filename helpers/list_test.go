@@ -23,7 +23,7 @@ type Resp struct {
 
 type Item struct {
 	gorm.Model
-	Foo    string
+	Foo    string `binding:"required"`
 	Bar    string
 	UserID int
 	Age    int

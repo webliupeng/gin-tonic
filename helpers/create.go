@@ -50,6 +50,8 @@ func Create(instanceCreator ModelInstanceCreator) gin.HandlerFunc {
 			} else {
 				ErrorResponse(c, http.StatusInternalServerError, err.Error())
 			}
+		} else {
+			ErrorResponse(c, http.StatusBadRequest, err.Error())
 		}
 	}
 }

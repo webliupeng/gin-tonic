@@ -40,6 +40,24 @@ func TestCreateUninsterable(t *testing.T) {
 	assert.Equal(t, 201, record.Code)
 }
 
+func TestCreateEmptyFieldValueRequired(t *testing.T) {
+	req, _ := http.NewRequest("POST", "/list", bytes.NewReader([]byte(`{
+		"user_id": 1
+	}`)))
+	record := httptest.NewRecorder()
+
+	R.ServeHTTP(record, req)
+
+	result := map[string]interface{}{}
+	json.Unmarshal(record.Body.Bytes(), &result)
+
+	if val, ok := result["UserID"].(int); ok {
+		assert.Equal(t, 0, val)
+	}
+
+	assert.Equal(t, 400, record.Code)
+}
+
 func TestCreateWithoutWritable(t *testing.T) {
 	req, _ := http.NewRequest("POST", "/list2", bytes.NewReader([]byte(`{
 		"foo":"REPLY"
