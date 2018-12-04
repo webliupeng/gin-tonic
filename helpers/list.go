@@ -175,7 +175,9 @@ func ListHandlerWithoutServe(modelIns interface{}, c *gin.Context, paramCreators
 			query = paramCreator(query, c)
 		}
 
-		query.Find(x.Interface())
+		if err := query.Find(x.Interface()).Error; err != nil {
+			panic(err)
+		}
 
 		var total int
 		query.Model(modelIns).Count(&total)
@@ -207,7 +209,9 @@ func List(modelIns interface{}, paramCreators ...CriteriaCreator) gin.HandlerFun
 				query = paramCreator(query, c)
 			}
 
-			query.Find(x.Interface())
+			if err := query.Find(x.Interface()).Error; err != nil {
+				panic(err)
+			}
 
 			var total int
 			query.Model(modelIns).Count(&total)
