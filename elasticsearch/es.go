@@ -1,8 +1,9 @@
 package elasticsearch
 
 import (
-	"fmt"
 	"errors"
+	"fmt"
+
 	"github.com/parnurzeal/gorequest"
 )
 
@@ -25,7 +26,11 @@ func (c *Client) post(index string, action string, dsl interface{}) *Result {
 	resultBody := &ResultBody{}
 
 	resp, body, errs := request.Post(url).Send(&dsl).EndStruct(&resultBody)
+
 	if resp.StatusCode >= 400 {
+		if errs == nil {
+			errs = []error{}
+		}
 		errs = append(errs, errors.New(string(body)))
 	}
 
