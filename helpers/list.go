@@ -214,7 +214,7 @@ func List(modelIns interface{}, paramCreators ...CriteriaCreator) gin.HandlerFun
 			}
 
 			var total int
-			query.Model(modelIns).Count(&total)
+			query.Model(modelIns).Offset(nil).Limit(nil).Count(&total)
 
 			//total, data := ListHandlerWithoutServe(modelIns, c, paramCreators...)
 
