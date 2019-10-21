@@ -9,6 +9,7 @@ before_script:
  - "mysql -e 'create database gintonic;'"
 
 before_install:
+  - export GO111MODULE=on
   - go get github.com/tcnksm/ghr
   - go get github.com/axw/gocov/gocov
   - go get github.com/mattn/goveralls

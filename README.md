@@ -105,7 +105,7 @@ router.Put("/customers/:id",
 
 ```
 
-*Configiuration*
+*Configuration*
 
 `gin-tonic` needs some config to read MySql, It's uses [Viper](https://github.com/spf13/viper) to read config.I recommend use enviroment varibles to config gin-tonic.
 
