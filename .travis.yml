@@ -3,7 +3,7 @@ services:
   - mysql
   - redis
 go: 
- - 1.9.x
+ - 1.12.x
 
 before_script:
  - "mysql -e 'create database gintonic;'"
