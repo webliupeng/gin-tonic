@@ -12,10 +12,9 @@ Gin-tonic is inspired by redstone's [Open-Rest](https://github.com/open-node/ope
 
 **Quick start**
 
-*Define model*
-
-*implement accessible interfaces to expose model CRUD behaviors
+implement accessible interfaces to expose model CRUD behaviors
 ```go
+/* define a gorm model */
 type Customer struct {
   Name string
   Age uint
@@ -43,7 +42,6 @@ func (f *Foo)FilterableFields() []string {
 }
 ```
 
-
 *List Handler Example*
 ```go
 import (
@@ -52,9 +50,24 @@ import (
 
 router.Get("/customers", helpers.List(&Customer{}))
 ```
+
+ gin-tonic supports below sql expressions in querystring to filter list data.
+| express |  usage  |
+|---|---|
+| >  | field_gt=val  |
+| >= | field_gte=val |   
+| <  | field_lt=val |
+| <=  | field_lte=val  |
+| like  |  field_like=val |
+| in  |  field_in=val1,val2,valn |
+| not in  |  field_not=val1,val2,valn |
+
+
+
 ```shell
-curl yourdomain/customers?.maxResults=100&.offset=10 # equals LIMIT 10, 100
-curl yourdomain/customers?age_lt=10
+curl http://hostname/customers?.maxResults=100&.offset=10 # equals LIMIT 10, 100
+curl http://hostname/customers?age_lt=10  #list custerms filtered by age granther 10
+curl http://hostname/customers?age=10
 ```
 *Create Handler Example*
 
@@ -90,4 +103,16 @@ router.Put("/customers/:id",
   helpers.Delete("customer") // delete the record by context name 
 )
 
+```
+
+*Configiuration*
+
+`gin-tonic` needs some config to read MySql, It's uses [Viper](https://github.com/spf13/viper) to read config.I recommend use enviroment varibles to config gin-tonic.
+
+```shell
+export GTC_DB_HOST=localhost
+export GTC_DB_NAME=dbname
+export GTC_DB_PORT=3306
+export GTC_DB_USER=username
+export GTC_DB_PASSWORD=password
 ```
