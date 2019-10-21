@@ -52,16 +52,16 @@ router.Get("/customers", helpers.List(&Customer{}))
 ```
 
  gin-tonic supports below sql expressions in querystring to filter list data.
-| express |  usage  |
-|---|---|
-| >  | field_gt=val  |
-| >= | field_gte=val |   
-| <  | field_lt=val |
-| <=  | field_lte=val  |
-| like  |  field_like=val |
-| in  |  field_in=val1,val2,valn |
-| not in  |  field_not=val1,val2,valn |
 
+| express | usage                    |
+| ------- | ------------------------ |
+| >       | field_gt=val             |
+| >=      | field_gte=val            |   
+| <       | field_lt=val             |
+| <=      | field_lte=val            |
+| like    | field_like=val           |
+| in      | field_in=val1,val2,valn  |
+| not in  | field_not=val1,val2,valn |
 
 
 ```shell
