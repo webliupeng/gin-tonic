@@ -66,7 +66,7 @@ router.Get("/customers", helpers.List(&Customer{}))
 
 ```shell
 curl http://hostname/customers?.maxResults=100&.offset=10 # equals LIMIT 10, 100
-curl http://hostname/customers?age_lt=10  #list custerms filtered by age granther 10
+curl http://hostname/customers?age_lt=10  #list custerms filtered by age less than 10
 curl http://hostname/customers?age=10
 ```
 *Create Handler Example*
