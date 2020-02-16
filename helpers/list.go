@@ -18,8 +18,8 @@ type condition struct {
 	Oparator string
 }
 
-var MaxResultsQuerySrtringKey = ".maxResults"
-var OffsetQuerySrtringKey = ".offset"
+var MaxResultsQueryStringKey = ".maxResults"
+var OffsetQueryStringKey = ".offset"
 
 // CriteriaCreator - 条件构造
 type CriteriaCreator func(db *gorm.DB, c *gin.Context) *gorm.DB
@@ -124,7 +124,7 @@ func BuildQueryDB(modelIns interface{}, c *gin.Context) (*gorm.DB, error) {
 		}
 	}
 
-	pageSize, err := strconv.Atoi(c.DefaultQuery(MaxResultsQuerySrtringKey, "10"))
+	pageSize, err := strconv.Atoi(c.DefaultQuery(MaxResultsQueryStringKey, "10"))
 	offset, err2 := strconv.Atoi(c.DefaultQuery(OffsetQueryStringKey, "0"))
 	if pageSize > 1000 {
 		panic("page size too large")
