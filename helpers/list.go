@@ -20,6 +20,7 @@ type condition struct {
 
 var MaxResultsQueryStringKey = ".maxResults"
 var OffsetQueryStringKey = ".offset"
+var SortQueryStringKey = ".sort"
 
 // CriteriaCreator - 条件构造
 type CriteriaCreator func(db *gorm.DB, c *gin.Context) *gorm.DB
@@ -145,7 +146,7 @@ func BuildQueryDB(modelIns interface{}, c *gin.Context) (*gorm.DB, error) {
 			sortableFields[val] = true
 		}
 
-		orderby := c.DefaultQuery(".sort", "id")
+		orderby := c.DefaultQuery(SortQueryStringKey, "id")
 		orderField := orderby
 		isDesc := false
 		if orderby[0:1] == "-" {
