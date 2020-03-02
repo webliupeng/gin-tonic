@@ -48,6 +48,15 @@ func Update(name string) gin.HandlerFunc {
 		}
 
 		if err := c.ShouldBindBodyWith(instance, binding.JSON); err == nil {
+
+			if validate, ok := instance.(db.Validate); ok {
+				err := validate.Validate()
+				if err != nil {
+					ErrorResponse(c, http.StatusBadRequest, err.Error())
+					return
+				}
+			}
+
 			if err := db.DB().Save(instance).Error; err == nil {
 				if currentHp == mainHp {
 					c.JSON(http.StatusOK, instance)

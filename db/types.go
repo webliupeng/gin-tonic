@@ -31,6 +31,10 @@ type Filterable interface {
 	FilterableFields() []string
 }
 
+type Validate interface {
+	Validate() error
+}
+
 // 指定model哪些字段可以修改
 type Updatable interface {
 	UpdatableFields() []string

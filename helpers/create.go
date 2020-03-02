@@ -45,6 +45,13 @@ func Create(instanceCreator ModelInstanceCreator) gin.HandlerFunc {
 		}
 
 		if err := c.ShouldBindBodyWith(modelInstance, binding.JSON); err == nil {
+			if validate, ok := modelInstance.(db.Validate); ok {
+				err := validate.Validate()
+				if err != nil {
+					ErrorResponse(c, http.StatusBadRequest, err.Error())
+					return
+				}
+			}
 			if err := db.DB().Save(modelInstance).Error; err == nil {
 				c.JSON(http.StatusCreated, &modelInstance)
 			} else {
