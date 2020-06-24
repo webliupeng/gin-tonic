@@ -184,7 +184,7 @@ func ListHandlerWithoutServe(modelIns interface{}, c *gin.Context, paramCreators
 		}
 
 		var total int
-		query.Model(modelIns).Count(&total)
+		query.Model(modelIns).Offset(nil).Limit(nil).Count(&total)
 
 		//total, data := ListHandlerWithoutServe(modelIns, c, paramCreators...)
 		return total, x.Interface()
