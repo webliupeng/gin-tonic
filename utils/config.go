@@ -62,7 +62,9 @@ func GetConfig() *viper.Viper {
 
 	locker.Lock()
 	defer locker.Unlock()
-
+	
+	testing.Init()
+	
 	flag.Parse()
 
 	viperRuntime.SetConfigType("json")
