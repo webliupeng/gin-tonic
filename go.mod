@@ -17,7 +17,6 @@ require (
 	github.com/stretchr/objx v0.2.0
 	github.com/stretchr/testify v1.7.0
 	github.com/ugorji/go v1.2.6 // indirect
-	golang.org/x/crypto v0.0.0-20220126234351-aa10faf2a1f8 // indirect
-	golang.org/x/text v0.3.8 // indirect
+	golang.org/x/crypto v0.1.0 // indirect
 	google.golang.org/protobuf v1.27.1 // indirect
 )
